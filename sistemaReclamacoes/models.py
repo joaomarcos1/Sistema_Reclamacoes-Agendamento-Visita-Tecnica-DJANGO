@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.contrib import auth
 import re
@@ -22,6 +23,7 @@ class Tecnico_Campo(models.Model):
     idt = models.TextField()
     nome = models.TextField()
     telefone = models.TextField()
+
 
     def setId(self, ident):
         self.id = ident
@@ -113,7 +115,6 @@ class Evento(models.Model):
 		return self.nome_evento
 
 		
-
 
 
 
@@ -298,7 +299,7 @@ class horarios_laboratorio(models.Model):
 
 
 
-class Pessoa(models.Model):
+class Cliente(models.Model):
 	#username = models.CharField(max_length=50,unique=True,null=True)
 	#password = models.CharField(max_length=50,null=True)
 	user = models.OneToOneField(User, on_delete = models.CASCADE, default='')
@@ -308,10 +309,16 @@ class Pessoa(models.Model):
 	#curso = models.ManyToManyField(Curso)
 	#curso = models.ForeignKey(Curso, default=2, on_delete = models.CASCADE)
 	email = models.TextField()
+	telefone = models.TextField()
 	data_nascimento = models.TextField(max_length=20)
 	status = models.TextField()
 	#funcao = models.ForeignKey(Funcao, default=2, on_delete = models.CASCADE)
 	funcao = models.TextField(default='')
+
+	def setTelefone(self, telef):
+		self.telefone = telef
+	def getTelefone(self):
+		return self.telefone
 
 	def setUserName(self, username):
 		self.username = username
@@ -367,7 +374,7 @@ class Artigo(models.Model):
 	autor = models.ForeignKey(Professor, default=2, on_delete=models.CASCADE)
 	titulo = models.TextField(default='')
 	coautor = models.TextField(default='')
-	#caoutor = models.ForeignKey(Pessoa, on_delete=models.CASCADE)
+	
 	orientador = models.TextField(default='')
 	status = models.ForeignKey(StatusArtigo, default=1, on_delete=models.CASCADE)
 	#status = models.TextField(default='')

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404,render_to_response, redirect
-from .models import Pessoa, Curso, Funcao, StatusArtigo, Artigo, Noticia, Evento, Area, Aluno, Professor, horarios_laboratorio
+from .models import Curso, Funcao, StatusArtigo, Artigo, Noticia, Evento, Area, Aluno, Professor, horarios_laboratorio
 
 
 from django.http import HttpResponse
