@@ -4,13 +4,13 @@ from django.contrib import auth
 import re
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.core import validators
+#from django.core import validators
 
 from django.db import models
-from django.contrib import auth
+from django.contrib import auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.core import validators
+#from django.core import validators
 from django.utils.translation import ugettext_lazy as _
 import re
 
@@ -20,16 +20,16 @@ import re
 
 # Create your models here.
 class Tecnico_Campo(models.Model):
-    idt = models.TextField()
+    #idt = models.IntegerField(primary_key=True)
     nome = models.TextField()
     telefone = models.TextField()
 
 
-    def setId(self, ident):
-        self.id = ident
+    #def setId(self, ident):
+    #    self.id = ident
 
-    def getId(self, ident):
-        return self.id
+    #def getId(self, ident):
+    #    return self.id
 
     def setNome(self, nome):
         self.nome = nome
@@ -44,6 +44,109 @@ class Tecnico_Campo(models.Model):
         return self.telefone
 
 
+class atendente(models.Model):
+	id = models.TextField(primary_key=True)
+	nome = models.TextField()
+
+
+class Cliente(models.Model):
+	#username = models.CharField(max_length=50,unique=True,null=True)
+	#password = models.CharField(max_length=50,null=True)
+	user = models.ManyToManyField(User)
+	idUser = models.TextField(unique=True,null=False, default='', primary_key=True)
+	nome = models.CharField(max_length=50,null=True)
+	cpf = models.IntegerField(unique=True,null=True)
+	#curso = models.ManyToManyField(Curso)
+	#curso = models.ForeignKey(Curso, default=2, on_delete = models.CASCADE)
+	email = models.TextField()
+	telefone = models.TextField()
+	data_nascimento = models.TextField(max_length=20)
+	#status = models.TextField()
+	#funcao = models.ForeignKey(Funcao, default=2, on_delete = models.CASCADE)
+	#funcao = models.TextField(default='')
+
+	def setTelefone(self, telef):
+		self.telefone = telef
+	def getTelefone(self):
+		return self.telefone
+
+	def setUserName(self, username):
+		self.username = username
+	def getUserName(self):
+		return self.username
+
+	def setPassword(self, password):
+		self.password = password
+	def getPassword(password):
+		return self.password
+
+
+	def setID(self, matricula):
+		self.idUser = matricula
+	def getID(self):
+		return self.idUser
+
+	def setnNome(self, nome):
+		self.nome = nome
+	def getNome(self):
+		return self.nome
+
+	def setCPF(self, cpf):
+		self.cpf = cpf
+	def getCPF(self):
+		return self.cpf
+
+	def setEmail(self, email):
+		self.email = email
+	def getEmail(self):
+		return self.email
+
+	def setDataNascimento(self, data_nascimento):
+		self.data_nascimento = data_nascimento
+	def getDataNascimnto(self):
+		return self.data_nascimento
+
+	def setSenha(self, senha):
+		self.senha = senha
+	def getSenha(self):
+		return self.senha
+
+
+
+
+	def __str__(self):
+		return self.nome
+
+
+class situacaoAtendimento(models.Model):
+	SITUACAO_ATENDIMENTO = (
+		("A", "CHAMADO ABERTO"),
+		("EA", "CHAMADO EM ATENDIMENTO PELO TÉCNICO"),
+		("F", "CHAMADO FINALIZADO")
+	)
+
+class reclamacao(models.Model):
+	problemaEnfrentado = models.TextField()
+	comentarioProblema = models.TextField()
+
+	def setProblemaEnfrentado(self, prob):
+		self.problemaEnfrentado = prob
+	def getProblemaEnfrentado(self):
+		return self.problemaEnfrentado
+
+	def setComentarioProblema(self, com):
+		self.problemaEnfrentado = com
+	def getCometarioProblema(self):
+		return self.comentarioProblema
+
+class atendimento(models.Model):
+	#id = models.TextField(primary_key=True)
+	cliente = models.ManyToManyField(User)
+	situacao = models.TextField()
+	hora_inicio = models.DateTimeField()
+	hora_fim = models.DateTimeField()
+
+
 class Curso(models.Model):
 	curso = models.TextField()
 	def __str__(self):
@@ -55,15 +158,11 @@ class Funcao(models.Model):
 	def __str__(self):
 		return self.funcao
 
+
 class StatusArtigo(models.Model):
 	status = models.TextField()
 	def __str__(self):
 		return self.status
-
-
-
-
-
 
 
 class Evento(models.Model):
@@ -113,12 +212,6 @@ class Evento(models.Model):
 
 	def __str__(self):
 		return self.nome_evento
-
-		
-
-
-
-
 
 
 
@@ -180,12 +273,6 @@ class Aluno(models.Model):
 		return self.cpf
 
 
-#	def setEmail(self, email):
-#		self.email = email
-#	def getEmail(self):
-#		return self.email
-
-
 
 	def setDataNascimento(self, data_nascimento):
 		self.data_nascimento = data_nascimento
@@ -200,7 +287,6 @@ class Aluno(models.Model):
 
 	def __str__(self):
 		return self.nome
-
 
 
 class Professor(models.Model):
@@ -298,78 +384,6 @@ class horarios_laboratorio(models.Model):
 
 
 
-
-class Cliente(models.Model):
-	#username = models.CharField(max_length=50,unique=True,null=True)
-	#password = models.CharField(max_length=50,null=True)
-	user = models.OneToOneField(User, on_delete = models.CASCADE, default='')
-	matricula = models.TextField(unique=True,null=False, default='')
-	nome = models.CharField(max_length=50,null=True)
-	cpf = models.IntegerField(unique=True,null=True)
-	#curso = models.ManyToManyField(Curso)
-	#curso = models.ForeignKey(Curso, default=2, on_delete = models.CASCADE)
-	email = models.TextField()
-	telefone = models.TextField()
-	data_nascimento = models.TextField(max_length=20)
-	status = models.TextField()
-	#funcao = models.ForeignKey(Funcao, default=2, on_delete = models.CASCADE)
-	funcao = models.TextField(default='')
-
-	def setTelefone(self, telef):
-		self.telefone = telef
-	def getTelefone(self):
-		return self.telefone
-
-	def setUserName(self, username):
-		self.username = username
-	def getUserName(self):
-		return self.username
-
-	def setPassword(self, password):
-		self.password = password
-	def getPassword(password):
-		return self.password
-
-
-	def setMatricula(self, matricula):
-		self.matricula = matricula
-	def getMatricula(self):
-		return self.matricula
-
-	def setnNome(self, nome):
-		self.nome = nome
-	def getNome(self):
-		return self.nome
-
-	def setCPF(self, cpf):
-		self.cpf = cpf
-	def getCPF(self):
-		return self.cpf
-
-	def setEmail(self, email):
-		self.email = email
-	def getEmail(self):
-		return self.email
-
-	def setDataNascimento(self, data_nascimento):
-		self.data_nascimento = data_nascimento
-	def getDataNascimnto(self):
-		return self.data_nascimento
-
-	def setSenha(self, senha):
-		self.senha = senha
-	def getSenha(self):
-		return self.senha
-
-
-
-
-	def __str__(self):
-		return self.nome
-
-
-
-
 class Artigo(models.Model):
 	autor = models.ForeignKey(Professor, default=2, on_delete=models.CASCADE)
 	titulo = models.TextField(default='')
@@ -410,8 +424,6 @@ class Artigo(models.Model):
 		return self.titulo
 
 
-
-
 class Noticia(models.Model):
     autor = models.ForeignKey(Professor, default=1, on_delete = models.CASCADE)
     descricao = models.CharField(max_length=100, null=True)
@@ -442,7 +454,6 @@ class Noticia(models.Model):
 
     def __str__(self):
         return self.titulo
-
 
 
 class Area(models.Model):

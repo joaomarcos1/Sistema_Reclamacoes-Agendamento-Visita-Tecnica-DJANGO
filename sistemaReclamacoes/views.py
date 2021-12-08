@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404,render_to_response, redirect
-from .models import Curso, Funcao, StatusArtigo, Artigo, Noticia, Evento, Area, Aluno, Professor, horarios_laboratorio
+from .models import reclamacao, Curso, Funcao, StatusArtigo, Artigo, Noticia, Evento, Area, Aluno, Professor, horarios_laboratorio
 
 
 from django.http import HttpResponse
@@ -143,9 +143,6 @@ def logout(request):
 
 
 
-
-
-
 def cadastro_usuario(request):
 	form = RegistrationForm(request.POST or None)
 	if form.is_valid():
@@ -171,21 +168,25 @@ def cadastro_usuario(request):
 
 
 
-def cadastro_artigo(request):
-	artigos = Artigo()
-	alunos = Aluno.objects.all()
-	professores= Professor.objects.all()
+def cadastro_artigo(request, id):
+	#artigos = Artigo()
+	#alunos = Aluno.objects.all()
+	#professores= Professor.objects.all()
+	reclam = reclamacao()
 	codigo = 0
 	if(request.method == 'POST'):
-		artigos.setTitulo(request.POST.get('titulo_Artigo'))
-		artigos.setAutor(request.POST.get('autor_Artigo'))
-		artigos.setCoautor(request.POST.get('coautor_Artigo'))
-		artigos.setOrientador(request.POST.get('orientador_Artigo'))
-		artigos.setStatus(request.POST.get('status_Artigo'))
-		artigos.save()
+		reclam.setProblemaEnfrentado(request.POST.get('problema_enfrentado'))
+		reclam.setComentarioProblema(request.POST.get('comentarioReclamacao'))
+		#artigos.setCoautor(request.POST.get('coautor_Artigo'))
+		#artigos.setOrientador(request.POST.get('orientador_Artigo'))
+		#artigos.setStatus(request.POST.get('status_Artigo'))
+		#artigos.save()
+		reclam.save()
 		codigo = 1
-		return render(request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
-	return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+		return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'reclam': reclam})
+		#return render(request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	#return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'reclam': reclam})
 
 
 
