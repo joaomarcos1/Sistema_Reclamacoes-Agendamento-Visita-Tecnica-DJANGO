@@ -1,25 +1,30 @@
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404,render_to_response, redirect
-from .models import reclamacao, Curso, Funcao, StatusArtigo, Artigo, Noticia, Evento, Area, Aluno, Professor, horarios_laboratorio
+from .models import Tecnico_Campo, atendente,atendimento, reclamacao, Curso, Funcao, StatusArtigo, Artigo, Noticia, Evento, Area, Aluno, Professor, horarios_laboratorio, situacaoAtendimento, Cliente
 
 
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from datetime import datetime
+from datetime import date, datetime
 
 
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse
 from django.contrib import auth
-
+from django.contrib.auth import get_user_model, get_user
 
 from .forms import RegistrationForm
 
+from datetime import datetime 
+from django.http import HttpResponseRedirect
+import time
 
 # Create your views here.
 
 def index(request):
 	noticias = Noticia.objects.all().order_by('data_lancamento_noticia').reverse()
 	return render (request, 'index.html', {'noticias':noticias})
+
 
 
 def login_user(request):
@@ -35,11 +40,11 @@ def login_user(request):
 					return redirect('/admin')
 				else:
 					# Seleção radiobutton
-					tipo_usuario = request.POST.get('optradio')
-					if tipo_usuario == 'professor':
-						return render(request, 'interface_professor.html')
-					elif tipo_usuario == 'aluno':
-						return render(request, 'interface_usuario.html')
+					#tipo_usuario = request.POST.get('optradio')
+					#if tipo_usuario == 'professor':
+					#	return render(request, 'interface_professor.html')
+					#elif tipo_usuario == 'aluno':
+					return render(request, 'interface_usuario.html')
 					#return render(request, 'interface_usuario.html')
 					#return redirect('/interface_usuario')
 			else:
@@ -47,49 +52,6 @@ def login_user(request):
 		else:
 			return render (request, 'login.html', {'error_message': 'Login Inválido!'})
 	return render (request,'login.html')
-
-
-
-'''
-def login_user(request):
-	if (request.method == 'POST'):
-		username = request.POST.get('username')
-		password = request.POST.get('password')
-		tipo_usuario = request.POST.get('optradio')
-		if (tipo_usuario == "Sou Professor"):
-			professor = Professor.objects.get(usuario=username, senha=password)
-			return redirect ('/interface_professor/professor.id')
-		if (tipo_usuario == "Sou Administrador"):
-			render (request,'/admin')
-	return render (request,'login.html')
-'''
-
-
-
-def artigos(request):
-	artigos = Artigo.objects.all()
-	return render (request, 'artigos.html', {'artigos':artigos})
-
-
-
-
-
-
-
-
-def cadastro_em_evento(request, id):
-    eventos = Evento.objects.all().filter(id=id)
-   
-    if (request.method == 'POST'):
-    #    print("aaa")
-    	Aluno.setEventoCadastrado(eventos)
-    	Aluno.save
-    return render(request, 'cadastro_em_evento.html', {'eventos':eventos})
-
-
-def eventos(request):
-	eventos = Evento.objects.all()
-	return render (request, 'eventos.html', {'eventos':eventos})
 
 
 
@@ -102,44 +64,198 @@ def interface_professor(request, id):
 
 
 
+def interface_atendente(request, pk=None):
+	reclama = reclamacao.objects.all()
+	atend = atendimento.objects.all()
+	cliente = Cliente.objects.all()
+	tecnicoCampo = Tecnico_Campo.objects.all()
 
+	for a in reclama:
+		print (a.comentarioProblema)
 
-
-def interface_usuario(request, pk=None):
-	'''
-	if not request.user.is_authenticaded():
-		return redirect('/login')
-		#return redirect('/interface_usuario/')
-	else:
-		if pk:
-			user = User.objetcs.get(pk)
-		else:
-			user = request.user
-			args = {'user': user}
-			#args = request.user
-			HttpResponseRedirect(request, 'interface_usuario.html', {'args':args})
-	return render (request, 'interface_usuario.html')
-'''
 	if pk:
 		user = User.objetcs.get(pk)
 	else:
 		user = request.user
 		args = {'user': user}
 			#args = request.user
-		return render (request, 'interface_usuario.html', {'args':args})
-	return render (request, 'interface_usuario.html')
+		return render (request, 'interface_atendente.html', {'args':args, 'reclama':reclama, 'cliente':cliente, 'atend':atend, 'tecnico_campo':tecnicoCampo})
+	return render (request, 'interface_atendente.html', {'reclama':reclama, 'atend':atend, 'cliente':cliente,'tecnico_campo':tecnicoCampo})
 
 
 
+def edicao_atendimento(request, id):
+	#artigos = Artigo()
+	#alunos = Aluno.objects.all()
+	#professores= Professor.objects.all()
+	reclam = reclamacao()
+	atend = atendimento()
+	tecCampo = Tecnico_Campo.objects.all()
+	#sitAtend = situacaoAtendimento()
+	codigo = 0
+
+
+	user = get_user_model()
+	users = user.objects.all()
+
+	#for a in users:
+	#	print (a.username)
+
+	#id_objectTpUpdate
+	atendimemt = atendimento.objects.filter(id = id)
+	
+
+	if(request.method == 'POST'):
+		#reclam.setProblemaEnfrentado(request.POST.get('problema_enfrentado'))
+		#reclam.setComentarioProblema(request.POST.get('comentarioReclamacao'))
+
+		#idUpdate = users.filter(username=request.POST.get('user_cliente')) #buscando o user com o username escolhido pelo usuário
+		#tecResp = tecCampo.filter(nome=request.POST.get('tec_campo')) #buscando o técnico de campo com o nome escolhido pelo usuário
+
+		
+		#atendimemt.update(cliente=idUpdate)
+		
+		#atendimemt.update(tecnico_resposavel=tecResp) #Atualizando o técnico resposável
+		atendimemt.update(situacao=request.POST.get('situacao_atendimento'))
+		atendimemt.update(hora_inicio=request.POST.get('data_inicio'))
+		atendimemt.update(hora_fim=request.POST.get('data_fim'))
+
+		#atend.setSituacaoAtendimento(sitAtend.objects.get(situacao=='Pendente'))
+
+		#atend.setSituacaoAtendimento('Pendente')
+
+		#atend.setHoraInicioAtendimento(datetime.now())
+		#atend.setHoraFimAtendimento(datetime.now())
+
+
+
+		#artigos.setCoautor(request.POST.get('coautor_Artigo'))
+		#artigos.setOrientador(request.POST.get('orientador_Artigo'))
+		#artigos.setStatus(request.POST.get('status_Artigo'))
+		#artigos.save()
+		#reclam.save()
+		atend.save()
+		codigo = 1
+		return render (request, 'edicao_atendimento.html', {'codigo':codigo, 'reclam': reclam, 'users':users, 'tecnico_campo': tecCampo})
+		#return render(request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	#return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	return render (request, 'edicao_atendimento.html', {'codigo':codigo, 'reclam': reclam, 'users': users, 'tecnico_campo': tecCampo})
+
+
+
+def cadastro_tecnico_campo(request):
+	
+	#reclam = reclamacao()
+	#atend = atendimento()
+	#sitAtend = situacaoAtendimento()
+	tecCampo = Tecnico_Campo()
+	codigo = 0
+	user = request.user
+	
+	if(request.method == 'POST'):
+		#reclam.setProblemaEnfrentado(request.POST.get('problema_enfrentado'))
+		#reclam.setComentarioProblema(request.POST.get('comentarioReclamacao'))
+
+		tecCampo.setNome(request.POST.get('nome_tecnico'))
+		tecCampo.setDataNascimento(request.POST.get('data_nascimento_tecnico'))
+		tecCampo.setCPF(request.POST.get('cpf_tecnico'))
+		tecCampo.setEndereco(request.POST.get('endereco_tecnico'))
+		tecCampo.setTelefone(request.POST.get('telefone_tecnico'))
+
+
+		#reclam.setUser(user)
+		#atend.cliente = user
+		
+		#atend.setSituacaoAtendimento(sitAtend.objects.get(situacao=='Pendente'))
+
+		#atend.setSituacaoAtendimento('Pendente')
+
+		#atend.setHoraInicioAtendimento(datetime.now())
+		#atend.setHoraFimAtendimento(datetime.now())
+
+
+
+		#artigos.setCoautor(request.POST.get('coautor_Artigo'))
+		#artigos.setOrientador(request.POST.get('orientador_Artigo'))
+		#artigos.setStatus(request.POST.get('status_Artigo'))
+		#artigos.save()
+		#reclam.save()
+		#atend.save()
+		tecCampo.save()
+		codigo = 1
+		#time.sleep(2)
+		return redirect('/interface_atendente')
+		#return render (request, 'cadastro_tecnico_campo.html', {'codigo':codigo, 'reclam': reclam})
+		#return render(request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	#return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	return render (request, 'cadastro_tecnico_campo.html', {'codigo':codigo})
+
+
+
+def interface_usuario(request, pk=None):
+
+	reclama = reclamacao.objects.all()
+	atend = atendimento.objects.all()
+	cliente = Cliente.objects.all()
+	tecnicoCampo = Tecnico_Campo.objects.all()
+
+
+	if pk:
+		user = User.objetcs.get(pk)
+	else:
+		user = request.user
+		args = {'user': user}
+			#args = request.user
+		return render (request, 'interface_usuario.html', {'args':args, 'reclama':reclama, 'cliente':cliente, 'atend':atend, 'tecnico_campo':tecnicoCampo})
+	return render (request, 'interface_usuario.html',  {'reclama':reclama, 'atend':atend, 'cliente':cliente,'tecnico_campo':tecnicoCampo})
+
+
+
+def cadastro_reclamacao(request, id):
+	#artigos = Artigo()
+	#alunos = Aluno.objects.all()
+	#professores= Professor.objects.all()
+	reclam = reclamacao()
+	atend = atendimento()
+	#sitAtend = situacaoAtendimento()
+	codigo = 0
+	user = request.user
+	
+	if(request.method == 'POST'):
+		reclam.setProblemaEnfrentado(request.POST.get('problema_enfrentado'))
+		reclam.setComentarioProblema(request.POST.get('comentarioReclamacao'))
+
+		reclam.clienteReclamante = user
+		#reclam.setUser(user)
+		atend.cliente = user
+		
+		#atend.setSituacaoAtendimento(sitAtend.objects.get(situacao=='Pendente'))
+
+		atend.setSituacaoAtendimento('Pendente')
+
+		atend.setHoraInicioAtendimento(datetime.now())
+		atend.setHoraFimAtendimento(datetime.now())
+
+
+
+		#artigos.setCoautor(request.POST.get('coautor_Artigo'))
+		#artigos.setOrientador(request.POST.get('orientador_Artigo'))
+		#artigos.setStatus(request.POST.get('status_Artigo'))
+		#artigos.save()
+		reclam.save()
+		atend.save()
+		codigo = 1
+		#return render (request, 'cadastro_reclamacao.html', {'codigo':codigo, 'reclam': reclam})
+		redirect('/interface_usuario')
+		#return render(request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	#return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	return render (request, 'cadastro_reclamacao.html', {'codigo':codigo, 'reclam': reclam})
 
 
 
 def logout(request):
 	auth.logout(request)
 	return redirect('/')
-
-
-
 
 
 
@@ -168,25 +284,384 @@ def cadastro_usuario(request):
 
 
 
-def cadastro_artigo(request, id):
-	#artigos = Artigo()
+def edicao_tecnico_campo(request, id):
+		#artigos = Artigo()
 	#alunos = Aluno.objects.all()
 	#professores= Professor.objects.all()
 	reclam = reclamacao()
+	atend = atendimento()
+	tecCampo = Tecnico_Campo.objects.all()
+	#sitAtend = situacaoAtendimento()
 	codigo = 0
+
+
+	user = get_user_model()
+	users = user.objects.all()
+	
+	tecnicoInfo = tecCampo.filter(id=id)
+
+	#	print (a.username)
+
+	#id_objectTpUpdate
+	atendimemt = atendimento.objects.filter(id = id)
+	
+
 	if(request.method == 'POST'):
-		reclam.setProblemaEnfrentado(request.POST.get('problema_enfrentado'))
-		reclam.setComentarioProblema(request.POST.get('comentarioReclamacao'))
+		#reclam.setProblemaEnfrentado(request.POST.get('problema_enfrentado'))
+		#reclam.setComentarioProblema(request.POST.get('comentarioReclamacao'))
+
+		#idUpdate = users.filter(username=request.POST.get('user_cliente')) #buscando o user com o username escolhido pelo usuário
+		#tecResp = tecCampo.filter(nome=request.POST.get('tec_campo')) #buscando o técnico de campo com o nome escolhido pelo usuário
+
+		
+		#atendimemt.update(cliente=idUpdate)
+		
+		#atendimemt.update(tecnico_resposavel=tecResp) #Atualizando o técnico resposável
+		atendimemt.update(situacao=request.POST.get('situacao_atendimento'))
+		atendimemt.update(hora_inicio=request.POST.get('data_inicio'))
+		atendimemt.update(hora_fim=request.POST.get('data_fim'))
+
+		#atend.setSituacaoAtendimento(sitAtend.objects.get(situacao=='Pendente'))
+
+		#atend.setSituacaoAtendimento('Pendente')
+
+		#atend.setHoraInicioAtendimento(datetime.now())
+		#atend.setHoraFimAtendimento(datetime.now())
+
+
+
 		#artigos.setCoautor(request.POST.get('coautor_Artigo'))
 		#artigos.setOrientador(request.POST.get('orientador_Artigo'))
 		#artigos.setStatus(request.POST.get('status_Artigo'))
 		#artigos.save()
-		reclam.save()
+		#reclam.save()
+		atend.save()
 		codigo = 1
-		return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'reclam': reclam})
+		redirect('/interface_atendente')
+		#return render (request, 'edicao_tecnico_campo.html', {'codigo':codigo, 'reclam': reclam, 'users':users, 'tecnico_campo': tecCampo})
 		#return render(request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
 	#return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
-	return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'reclam': reclam})
+	return render (request, 'edicao_tecnico_campo.html', {'codigo':codigo, 'reclam': reclam, 'users': users, 'tecnico_campo': tecCampo, 'tecnicoInfo': tecnicoInfo})
+
+
+
+def cadastro_atendimento(request):
+	
+	#reclam = reclamacao()
+	atend = atendimento()
+	#sitAtend = situacaoAtendimento()
+	tecCampo = Tecnico_Campo.objects.all()
+	codigo = 0
+	user = get_user_model()
+	users = user.objects.all()
+	
+	if(request.method == 'POST'):
+		#reclam.setProblemaEnfrentado(request.POST.get('problema_enfrentado'))
+		#reclam.setComentarioProblema(request.POST.get('comentarioReclamacao'))
+
+		#tecCampo.setNome(request.POST.get('nome_tecnico'))
+		#tecCampo.setDataNascimento(request.POST.get('data_nascimento_tecnico'))
+		#tecCampo.setCPF(request.POST.get('cpf_tecnico'))
+		#tecCampo.setEndereco(request.POST.get('endereco_tecnico'))
+		#tecCampo.setTelefone(request.POST.get('telefone_tecnico'))
+		user0= users.filter(id)
+		user1 = users.filter(user=request.POST.get('user_cliente'))
+
+		atend.cliente = user1
+		atend.tecnico_resposavel = tecCampo.filter(nome=request.POST.get('tec_campo'))
+		atend.setSituacaoAtendimento(request.POST.get('situacao_atendimento'))
+		atend.setHoraInicioAtendimento(request.POST.get('data_inicio'))
+		atend.setHoraFimAtendimento(request.POST.get('data_fim'))
+
+		#reclam.setUser(user)
+		#atend.cliente = user
+		
+		#atend.setSituacaoAtendimento(sitAtend.objects.get(situacao=='Pendente'))
+
+		#atend.setSituacaoAtendimento('Pendente')
+
+		#atend.setHoraInicioAtendimento(datetime.now())
+		#atend.setHoraFimAtendimento(datetime.now())
+
+
+
+		#artigos.setCoautor(request.POST.get('coautor_Artigo'))
+		#artigos.setOrientador(request.POST.get('orientador_Artigo'))
+		#artigos.setStatus(request.POST.get('status_Artigo'))
+		#artigos.save()
+		#reclam.save()
+		#atend.save()
+		#tecCampo.save()
+		atend.save()
+		codigo = 1
+		
+		#time.sleep(2)
+		return redirect('/interface_atendente')
+		#return render (request, 'cadastro_tecnico_campo.html', {'codigo':codigo, 'reclam': reclam})
+		#return render(request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	#return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	return render (request, 'cadastro_atendimento.html', {'codigo':codigo, 'users': users, 'tecnico_campo': tecCampo})
+
+
+
+def cadastro_atendente(request):
+	
+	#reclam = reclamacao()
+	atendiment = atendimento.objects.all()
+	#sitAtend = situacaoAtendimento()
+	#tecCampo = Tecnico_Campo.objects.all()
+	atend = atendente()
+	codigo = 0
+	#user = get_user_model()
+	#users = user.objects.all()
+
+	
+	if(request.method == 'POST'):
+		#reclam.setProblemaEnfrentado(request.POST.get('problema_enfrentado'))
+		#reclam.setComentarioProblema(request.POST.get('comentarioReclamacao'))
+
+		#tecCampo.setNome(request.POST.get('nome_tecnico'))
+		#tecCampo.setDataNascimento(request.POST.get('data_nascimento_tecnico'))
+		#tecCampo.setCPF(request.POST.get('cpf_tecnico'))
+		#tecCampo.setEndereco(request.POST.get('endereco_tecnico'))
+		#tecCampo.setTelefone(request.POST.get('telefone_tecnico'))
+		#user0= users.filter(id)
+		#user1 = users.filter(user=request.POST.get('user_cliente'))
+		atend.setNome(request.POST.get('nome_atendente'))
+		atend.setCPF(request.POST.get('cpf_atendente'))
+		atend.setEndereco(request.POST.get('endereco_atendente'))
+		atend.atendimentosRelacionados = request.POST.get('endereco_atendente')
+
+		#reclam.setUser(user)
+		#atend.cliente = user
+		
+		#atend.setSituacaoAtendimento(sitAtend.objects.get(situacao=='Pendente'))
+
+		#atend.setSituacaoAtendimento('Pendente')
+
+		#atend.setHoraInicioAtendimento(datetime.now())
+		#atend.setHoraFimAtendimento(datetime.now())
+
+
+
+		#artigos.setCoautor(request.POST.get('coautor_Artigo'))
+		#artigos.setOrientador(request.POST.get('orientador_Artigo'))
+		#artigos.setStatus(request.POST.get('status_Artigo'))
+		#artigos.save()
+		#reclam.save()
+		#atend.save()
+		#tecCampo.save()
+		atend.save()
+		codigo = 1
+		
+		#time.sleep(2)
+		return redirect('/interface_atendente')
+		#return render (request, 'cadastro_tecnico_campo.html', {'codigo':codigo, 'reclam': reclam})
+		#return render(request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	#return render (request, 'cadastro_artigo.html', {'codigo':codigo, 'professores':professores, 'alunos':alunos})
+	return render (request, 'cadastro_atendente.html', {'codigo':codigo, 'atend': atend, 'atendiment': atendiment})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -231,6 +706,25 @@ def entradas_alunos(request):
 	return render (request, 'entradas_alunos.html', {'entradas':entradas})
 
 
+
+def artigos(request):
+	artigos = Artigo.objects.all()
+	return render (request, 'artigos.html', {'artigos':artigos})
+
+
+def cadastro_em_evento(request, id):
+    eventos = Evento.objects.all().filter(id=id)
+   
+    if (request.method == 'POST'):
+    #    print("aaa")
+    	Aluno.setEventoCadastrado(eventos)
+    	Aluno.save
+    return render(request, 'cadastro_em_evento.html', {'eventos':eventos})
+
+
+def eventos(request):
+	eventos = Evento.objects.all()
+	return render (request, 'eventos.html', {'eventos':eventos})
 
 
 

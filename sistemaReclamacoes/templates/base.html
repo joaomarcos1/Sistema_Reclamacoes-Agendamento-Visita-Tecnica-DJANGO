@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Reaclame Telecom - {% block title %} {% endblock %}</title>
+    <title>Reclame Telecom - {% block title %} {% endblock %}</title>
 <!--
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-3.3.7/css/bootstrap-theme.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-3.3.7/css/bootstrap.css' %}">
@@ -20,6 +20,14 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
+<script type='text/javascript' src='https://code.jquery.com/jquery-1.11.0.js'></script>
+<script type='text/javascript' src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+<script type='text/javascript' scr='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'></script>
+<script type='text/javascript' scr='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
+<script type='text/javascript' scr='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+
+
+
   </head>
 
 
@@ -33,7 +41,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="index">LabOnline</a>
+          <a class="navbar-brand" href="/index">Reclame Online</a>
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
           <ul class="nav navbar-nav">
@@ -58,7 +66,7 @@
                 <a data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-option-vertical"></span></a>
                   <ul class="dropdown-menu">
                     <li><a href="/interface_usuario"> Meu Perfil</a></li>
-                    <li><a href="logout"> Sair</a></li>
+                    <li><a href="/logout"> Sair</a></li>
                   </ul>
               </li>
               {% else %}
@@ -74,7 +82,7 @@
               </li>
               {% endif %}
               {% else %}
-              <li><a id="logindex" href="login"><span class="glyphicon glyphicon-user" style="padding-right: 0.4em;"></span>Login</a></li>
+              <li><a id="logindex" href="/login"><span class="glyphicon glyphicon-user" style="padding-right: 0.4em;"></span>Login</a></li>
 
 
               <!--<li><a href="cadastro_usuario"><span class="glyphicon glyphicon-user" style="padding-right: 0.4em;"></span>Cadastre-se</a></li>-->
@@ -114,7 +122,7 @@
 
       <div  class="collapse navbar-collapse">
 
-          <div id="rodape" class="col-sm-12 col-md-12 col-xs-12 col-lg-12">
+          <div id="rodape" class="col-sm-12 col-md-12 col-xs-12 col-lg-10">
             <br>
 
 
