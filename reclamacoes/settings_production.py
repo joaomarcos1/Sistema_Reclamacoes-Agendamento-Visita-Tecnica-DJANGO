@@ -32,7 +32,7 @@ def get_linux_ec2_private_ip():
 # and add the instances private ip address
 private_ip = get_linux_ec2_private_ip()
 if private_ip:
-    ALLOWED_HOSTS += [private_ip, 'django-env.eba-pidv3ugc.us-west-2.elasticbeanstalk.com/']
+    ALLOWED_HOSTS += [private_ip, 'django-env.eba-pidv3ugc.us-west-2.elasticbeanstalk.com/', '*']
 
 # Other production overrides
-DEBUG = False
+DEBUG = True
