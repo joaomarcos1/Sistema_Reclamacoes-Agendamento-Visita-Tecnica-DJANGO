@@ -115,9 +115,10 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
+STATIC_URL = '/static/'
 
-STATIC_URL = '/var/wwww/html/relamacoes/static/'
-MEDIA_URL = '/var/wwww/html/relamacoes/media/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = '/var/www/html/reclamacoes/media/'
+
+STATIC_ROOT = '/var/www/html/reclamacoes/static/'
